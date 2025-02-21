@@ -11,7 +11,7 @@ class Settings(BaseModel):
     }
     DATABASE_URL: str = os.environ.get(
         "DATABASE_URL",
-        "postgresql+psycopg2://root:admin123@localhost:5432/expense_tracker_v1"
+        "postgresql+psycopg2://postgres:postgres@localhost:5432/expense_tracker_v1"
     )
     
 settings = Settings() 
