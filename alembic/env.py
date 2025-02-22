@@ -10,6 +10,9 @@ from app.core.config import settings  # Import your settings
 from app.models.base import Base  # This should be your declarative base
 # Import all your models here so Alembic can detect them
 from app.models import User  # for example, if you have a user model
+from app.models import CategoryByUser
+from app.models import Category
+from app.models import Expense
 
 import os
 import sys
