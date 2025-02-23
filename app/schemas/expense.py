@@ -1,9 +1,12 @@
 from pydantic import BaseModel
 
 class CategoryResponse(BaseModel):
-  id: int
+  names: list[str] = []
+class CategoryCreate(BaseModel):
   name: str
-
+class CategoryCreateResponse(BaseModel):
+  status: str = "OK"
+  message: str = "A new category has been created"
 class ExpenseResponse(BaseModel):
   id: int
   amount: int

@@ -9,6 +9,5 @@ class Expense(Base):
   amount = Column(Integer, nullable=False)
   description = Column(String, nullable=False)
   date = Column(Date, nullable=False)
-  category_id = Column(Integer, ForeignKey("categories.id"))
-  category_byuser_id = Column(Integer, ForeignKey("categories_byuser.id"))
+  category_name = Column(String, nullable=False)
   user_id = Column(Integer, ForeignKey("users.id"), index=True)

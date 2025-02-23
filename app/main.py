@@ -1,8 +1,8 @@
 from fastapi import FastAPI
-from .api import users, auth
+from .api import users, auth, categories
 
 app = FastAPI(
-  title="My Api",
+  title="Expense API Project",
   description="This is my api for my expense project",
   version="1.0.0",
   contact={
@@ -13,8 +13,6 @@ app = FastAPI(
 
 app.include_router(users.router, prefix="/api/v1")
 app.include_router(auth.router, prefix="/api/v1")
+app.include_router(categories.router, prefix="/api/v1")
 
-@app.get("/hello")
-async def root():
-  return {"message": "Hello World"}
 
