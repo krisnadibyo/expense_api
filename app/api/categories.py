@@ -3,8 +3,8 @@ from fastapi import APIRouter, Depends
 from app.api.dependencies import get_category_service
 from app.dependencies.auth import get_current_user
 from app.services.category_service import CategoryService
-from app.models.user import User
-from app.schemas.expense import CategoryCreate, CategoryCreateResponse, CategoryResponse
+from app.models import User
+from app.schemas import CategoryCreate, CategoryCreateResponse, CategoryResponse
 
 router = APIRouter(
   prefix="/categories",

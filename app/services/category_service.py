@@ -1,9 +1,8 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
-from app.models.category import Category
-from app.models.category_byuser import CategoryByUser
-from app.schemas.expense import CategoryResponse
+from app.models import Category, CategoryByUser
+from app.schemas import CategoryResponse
 
 class CategoryService:
   def __init__(self, db: Session):
