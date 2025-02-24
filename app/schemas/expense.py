@@ -1,4 +1,4 @@
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, field_validator, validator
 from datetime import date, datetime
 
 class CategoryResponse(BaseModel):
@@ -17,6 +17,27 @@ class ExpenseResponse(BaseModel):
   description: str
   date: str
   category_name: str
+
+class ExpenseGet(BaseModel):
+  start_date: date
+  end_date: date
+  
+  @field_validator('start_date', 'end_date', mode='before')
+  @classmethod
+  def parse_dates(cls, value):
+    if isinstance(value, str):
+      try:
+          return datetime.strptime(value, "%Y-%m-%d").date()
+      except ValueError:
+          raise ValueError("Date must be in YYYY-MM-DD format")
+    return value
+
+
+class ExpensesResponse(BaseModel):
+  start_date: str
+  end_date: str
+  expenses: list[ExpenseResponse]
+  total_amount: int
 
 class ExpenseCreate(BaseModel):
   amount: int

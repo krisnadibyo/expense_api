@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from app.models.expense import Expense
-from app.schemas.expense import ExpenseCreate, ExpenseResponse
+from app.schemas.expense import ExpenseCreate, ExpenseGet, ExpenseResponse, ExpensesResponse
 
 class ExpenseService:
   def __init__(self, db: Session):
@@ -35,4 +35,27 @@ class ExpenseService:
       raise HTTPException(
         status_code=400,
         detail=f"failed to create expense: {str(e)}"
-      )     
+      )   
+  
+  def get_expenses(self, expense_get: ExpenseGet, user_id: int) -> ExpensesResponse:
+    try:
+      expenses = self.db.query(Expense).filter(
+        Expense.user_id == user_id,
+        Expense.date >= expense_get.start_date,
+        Expense.date <= expense_get.end_date
+      ).all()
+      expenses_response = [ExpenseResponse(
+        id= expense.id,
+        amount= expense.amount,
+        description= expense.description,
+        date= str(expense.date),
+        category_name= expense.category_name
+      ) for expense in expenses]
+      return ExpensesResponse(
+        start_date= str(expense_get.start_date),
+        end_date= str(expense_get.end_date),
+        expenses= expenses_response,
+        total_amount= sum(expense.amount for expense in expenses)
+      )
+    except SQLAlchemyError as e:
+      raise HTTPException(status_code=500, detail=f"Failed to get expenses: {str(e)}")
