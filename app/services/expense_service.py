@@ -43,7 +43,7 @@ class ExpenseService:
         Expense.user_id == user_id,
         Expense.date >= expense_get.start_date,
         Expense.date <= expense_get.end_date
-      ).all()
+      ).order_by(Expense.date.desc()).limit(20).all()
       expenses_response = [ExpenseResponse(
         id= expense.id,
         amount= expense.amount,

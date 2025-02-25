@@ -8,6 +8,6 @@ class Expense(Base):
   id = Column(Integer, primary_key=True)
   amount = Column(Integer, nullable=False)
   description = Column(String, nullable=False)
-  date = Column(Date, nullable=False)
+  date = Column(Date, nullable=False, index=True)
   category_name = Column(String, nullable=False)
   user_id = Column(Integer, ForeignKey("users.id"), index=True)
