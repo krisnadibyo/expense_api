@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends
+from datetime import datetime
+from fastapi import APIRouter, Depends, Path
 
 from app.api.dependencies import get_expense_service
 from app.dependencies.auth import get_current_user
@@ -19,4 +20,13 @@ async def create_expense(expense_create: ExpenseCreate, current_user: User = Dep
 @router.get("/", response_model=ExpensesResponse)
 async def get_expenses(expense_get: ExpenseGet, current_user: User = Depends(get_current_user), expense_service: ExpenseService = Depends(get_expense_service)):
   result = expense_service.get_expenses(expense_get=expense_get, user_id=current_user.id)
+  return result
+
+@router.get("/{range_type}", response_model=ExpensesResponse)
+async def get_expenses_range(
+  range_type: str = Path(..., description="The type of range: 'today','week','month','quarter'"),
+  current_user: User = Depends(get_current_user), 
+  expense_service: ExpenseService = Depends(get_expense_service)
+):
+  result = expense_service.get_expenses_range(range_type=range_type, user_id=current_user.id)
   return result

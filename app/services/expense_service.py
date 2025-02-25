@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
@@ -59,3 +60,30 @@ class ExpenseService:
       )
     except SQLAlchemyError as e:
       raise HTTPException(status_code=500, detail=f"Failed to get expenses: {str(e)}")
+    
+  def get_expenses_range(self, range_type: str, user_id: int) -> ExpensesResponse:
+    current_date = datetime.now().date()
+    start_date = current_date
+    end_date = current_date
+    match range_type:
+      case "today":
+        pass
+      case "week":
+        start_date = current_date - timedelta(days=7)
+        end_date = current_date
+      case "month":
+        start_date = current_date - timedelta(days=30)
+        end_date = current_date
+      case "quarter":
+        start_date = current_date - timedelta(days=90)
+        end_date = current_date
+      case _:
+        raise HTTPException(
+          status_code=400,
+          detail=f"Invalid range type: {range_type}. Must be one of: 'today', 'week', 'month', 'quarter'"
+        )
+    request = ExpenseGet(
+      start_date= start_date,
+      end_date= end_date
+    )
+    return self.get_expenses(request, user_id)
