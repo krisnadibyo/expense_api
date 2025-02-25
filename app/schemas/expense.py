@@ -32,11 +32,25 @@ class ExpenseGet(BaseModel):
           raise ValueError("Date must be in YYYY-MM-DD format")
     return value
 
+class ExpensePerCategoryResponse(BaseModel):
+  category_name: str
+  amount: int
+
+class ExpensesPerDayResponse(BaseModel):
+  date: str
+  amount: int
 
 class ExpensesResponse(BaseModel):
   start_date: str
   end_date: str
   expenses: list[ExpenseResponse]
+  expenses_per_category: list[ExpensePerCategoryResponse]
+  expenses_per_day: list[ExpensesPerDayResponse]
+  total_amount: int
+
+
+class ExpensePerDayResponse(BaseModel):
+  date: str
   total_amount: int
 
 class ExpenseCreate(BaseModel):

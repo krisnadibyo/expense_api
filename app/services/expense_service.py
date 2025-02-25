@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from app.models import Expense
 from app.schemas import ExpenseCreate, ExpenseGet, ExpenseResponse, ExpensesResponse
+from app.schemas.expense import ExpensePerCategoryResponse, ExpensesPerDayResponse
 
 class ExpenseService:
   def __init__(self, db: Session):
@@ -44,19 +45,49 @@ class ExpenseService:
         Expense.user_id == user_id,
         Expense.date >= expense_get.start_date,
         Expense.date <= expense_get.end_date
-      ).order_by(Expense.date.desc()).limit(20).all()
-      expenses_response = [ExpenseResponse(
-        id= expense.id,
-        amount= expense.amount,
-        description= expense.description,
-        date= str(expense.date),
-        category_name= expense.category_name
-      ) for expense in expenses]
+      ).order_by(Expense.date.desc()).limit(100).all()
+      expenses_data = []
+      total_sum = 0
+      expenses_per_category = []
+      expenses_per_day = []
+      date_sums = {}
+      category_sums = {}
+      for expense in expenses:
+        total_sum += expense.amount
+        date_str = str(expense.date)
+        expenses_data.append(ExpenseResponse(
+          id= expense.id,
+          amount= expense.amount,
+          description= expense.description,
+          date= date_str,
+          category_name= expense.category_name
+        ))
+        if expense.category_name not in category_sums:
+          category_sums[expense.category_name] = 0
+        category_sums[expense.category_name] += expense.amount
+        if date_str not in date_sums:
+          date_sums[date_str] = 0
+        date_sums[date_str] += expense.amount
+      
+      # Convert to list of ExpensePerCategoryResponse objects
+      for category, amount in category_sums.items():
+        expenses_per_category.append(ExpensePerCategoryResponse(
+          category_name=category,
+          amount=amount
+        ))
+      # Convert to list of ExpensesPerDayResponse objects
+      for date, amount in date_sums.items():
+        expenses_per_day.append(ExpensesPerDayResponse(
+          date=date,
+          amount=amount
+        ))
       return ExpensesResponse(
         start_date= str(expense_get.start_date),
         end_date= str(expense_get.end_date),
-        expenses= expenses_response,
-        total_amount= sum(expense.amount for expense in expenses)
+        expenses= expenses_data,
+        expenses_per_category= expenses_per_category,
+        expenses_per_day= expenses_per_day,
+        total_amount= total_sum
       )
     except SQLAlchemyError as e:
       raise HTTPException(status_code=500, detail=f"Failed to get expenses: {str(e)}")
