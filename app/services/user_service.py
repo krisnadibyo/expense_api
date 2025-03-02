@@ -58,3 +58,4 @@ class UserService:
       access_token=access_token
     )
     return user_token_response
+

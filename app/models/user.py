@@ -8,4 +8,6 @@ class User(Base):
   email = Column(String, unique=True, index=True)
   username = Column(String, unique=True, index=True)
   hashed_password = Column(String)
+  whatsapp_number = Column(String, unique=True, index=True, nullable=True)
+  whatsapp_auth_key = Column(String, nullable=True)
   is_active = Column(Boolean, default=True)

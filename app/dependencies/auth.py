@@ -1,4 +1,3 @@
-from asyncio.log import logger
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from app.db.session import get_db
