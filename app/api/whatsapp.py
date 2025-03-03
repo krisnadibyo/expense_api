@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, Query
-from typing import Optional
 
-from app.api.dependencies import get_wa_service
+from app.dependencies.services import get_wa_service
 from app.services.wa_service import WaService
 
 
@@ -27,6 +26,7 @@ async def verify_webhook(
 async def receive_webhooks(request: Request, wa_service: WaService = Depends(get_wa_service)):
   try:
     data = await request.json()
-    return wa_service.handle_message(data)
+    await wa_service.handle_message(data)
+    return {"status": "Webhook received"}
   except HTTPException as e:
     raise HTTPException(status_code=500, detail=str(e))

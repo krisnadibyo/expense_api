@@ -12,7 +12,7 @@ class OpenAIService:
     self.openai_client = openai.OpenAI(api_key=self.openai_api_key)
     
     
-  def generate_response_to_system(self, message: str) -> dict:
+  def generate_response_to_system(self, message: str) -> str:
     try:
       response = self.openai_client.chat.completions.create(
         model=self.openai_model,

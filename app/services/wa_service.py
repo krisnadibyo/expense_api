@@ -1,7 +1,9 @@
 import os
 from dotenv import load_dotenv
-from fastapi import HTTPException, Request, logger
+from fastapi import HTTPException, logger
 import httpx
+
+from app.services.openai_service import OpenAIService
 
 
 load_dotenv()
@@ -12,11 +14,12 @@ VERSION=os.getenv("VERSION")
 VERIFY_TOKEN=os.getenv("VERIFY_TOKEN")
 
 class WaService:
-  def __init__(self):
+  def __init__(self, openai_service: OpenAIService):
     self.access_token = ACCESS_TOKEN
     self.phone_number_id = PHONE_NUMBER_ID
     self.version = VERSION
     self.verify_token = VERIFY_TOKEN
+    self.openai_service = openai_service
 
   async def verify_webhook(
     self,
@@ -33,7 +36,7 @@ class WaService:
       detail="Verification failed"
     )
     
-  def handle_message(self, message: dict):
+  async def handle_message(self, message: dict):
     """
     Handle incoming WhatsApp message webhook
     
@@ -67,6 +70,8 @@ class WaService:
               sender_id = msg["from"]
               
               # TODO: Process the message
+              response = self.openai_service.generate_response_to_system(message_body)
+              await self.send_message(response, sender_id)
               
           return {
             "status": "success",
@@ -80,8 +85,8 @@ class WaService:
     except Exception as e:
       return {"status": "error", "message": str(e)}
     
-  def send_message(self, message: str, recipient_waid: str):
-    url = f"https://graph.facebook.com/v{self.version}/{recipient_waid}/messages"
+  async def send_message(self, message: str, recipient_waid: str):
+    url = f"https://graph.facebook.com/{self.version}/{self.phone_number_id}/messages"
     headers = {
       "Authorization": f"Bearer {self.access_token}",
       "Content-Type": "application/json"
@@ -95,10 +100,9 @@ class WaService:
         "body": message
       }
     }
-    with httpx.AsyncClient() as client:
-      response = client.post(url, headers=headers, json=data)
+    async with httpx.AsyncClient() as client:
+      response = await client.post(url, headers=headers, json=data)
       if response.status_code == 200:
-        logger.info(f"Message sent successfully to {recipient_waid}: {message}")
+        logger.logger.info(f"Message sent successfully to {recipient_waid}: {message}")
       else:
-        raise HTTPException(status_code=500, detail=f"Failed to send message: {response.status_code}")
-
+        logger.logger.info(f"Failed to send message: {response}")

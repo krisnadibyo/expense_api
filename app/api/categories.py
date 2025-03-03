@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 
-from app.api.dependencies import get_category_service
+from app.dependencies.services import get_category_service
 from app.dependencies.auth import get_current_user
 from app.services.category_service import CategoryService
 from app.models import User

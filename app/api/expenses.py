@@ -1,7 +1,7 @@
 from datetime import datetime
 from fastapi import APIRouter, Depends, Path
 
-from app.api.dependencies import get_expense_service
+from app.dependencies.services import get_expense_service
 from app.dependencies.auth import get_current_user
 from app.models.user import User
 from app.schemas.expense import ExpenseCreate, ExpenseGet, ExpenseResponse, ExpensesResponse
