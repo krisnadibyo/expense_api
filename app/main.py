@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 
-from app.api import expenses
-from .api import users, auth, categories
+from .api import users, auth, categories,expenses, whatsapp
 
 app = FastAPI(
   title="Expense API Project",
@@ -17,4 +16,4 @@ app.include_router(users.router, prefix="/api/v1")
 app.include_router(auth.router, prefix="/api/v1")
 app.include_router(categories.router, prefix="/api/v1")
 app.include_router(expenses.router, prefix="/api/v1")
-
+app.include_router(whatsapp.router, prefix="/whatsapp")
