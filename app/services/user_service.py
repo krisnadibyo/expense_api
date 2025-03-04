@@ -4,6 +4,8 @@ from app.schemas import UserCreate, UserLogin, UserResponse, UserTokenResponse
 from app.core.security import get_password_hash, verify_password, create_access_token
 from fastapi import HTTPException
 
+from app.schemas.user import UserUpdate
+
 class UserService:
   def __init__(self, db: Session):
     self.db = db
@@ -17,11 +19,16 @@ class UserService:
     if self.db.query(User).filter(User.username == user.username).first():
       raise HTTPException(status_code=400, detail="Username already registered")
     
+    # Check if wa_number already exists
+    if user.wa_number and self.db.query(User).filter(User.whatsapp_number == user.wa_number).first():
+      raise HTTPException(status_code=400, detail="WhatsApp number already registered")
+    
     # Create user
     db_user = User(
       email=user.email,
       username=user.username,
       hashed_password=get_password_hash(user.password),
+      whatsapp_number=user.wa_number,
       is_active=True
     )
 
@@ -32,9 +39,32 @@ class UserService:
 
     return UserResponse(
       username=db_user.username,
-      email=db_user.email
+      email=db_user.email,
+      wa_number=db_user.whatsapp_number
     )
+  
+  def update_user(self, user_id: int, user: UserUpdate) -> UserResponse:
+    db_user = self.db.query(User).filter(User.id == user_id).first()
+    if not db_user:
+      raise HTTPException(status_code=404, detail="User not found")
+  
+    if user.wa_number:
+      db_user.whatsapp_number = user.wa_number
+    if user.username:
+      db_user.username = user.username
+    if user.email:
+      db_user.email = user.email
+    if user.password:
+      db_user.hashed_password = get_password_hash(user.password)
 
+    self.db.commit()
+    self.db.refresh(db_user)
+    
+    return UserResponse(
+      username=db_user.username,
+      email=db_user.email,
+      wa_number=db_user.whatsapp_number
+    )
 
   def authenticate_user(self, user_login: UserLogin) -> UserTokenResponse:
     # find user by username
