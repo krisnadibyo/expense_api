@@ -3,7 +3,7 @@ from app.models import User
 from app.schemas import UserCreate, UserLogin, UserResponse, UserTokenResponse
 from app.core.security import get_password_hash, verify_password, create_access_token
 from fastapi import HTTPException
-
+from app.utils.string_utils import isemail
 from app.schemas.user import UserUpdate
 
 class UserService:
@@ -11,6 +11,22 @@ class UserService:
     self.db = db
 
   def create_user(self, user: UserCreate) -> UserResponse:
+    # check if wa_number is not empty and valid number
+    if not user.wa_number:
+      raise HTTPException(status_code=400, detail="WhatsApp number is required")
+    if user.wa_number and not user.wa_number.isdigit():
+      raise HTTPException(status_code=400, detail="WhatsApp number must be a valid number")
+    if not user.email:
+      raise HTTPException(status_code=400, detail="Email is required")
+    if user.email and not isemail(user.email):
+      raise HTTPException(status_code=400, detail="Email must be a valid email")
+    if not user.username:
+      raise HTTPException(status_code=400, detail="Username is required")
+    if not user.password:
+      raise HTTPException(status_code=400, detail="Password is required")
+    if len(user.password) < 4:
+      raise HTTPException(status_code=400, detail="Password must be at least 4 characters long")
+
     # Check if email already exists
     if self.db.query(User).filter(User.email == user.email).first():
       raise HTTPException(status_code=400, detail="Email already registered")

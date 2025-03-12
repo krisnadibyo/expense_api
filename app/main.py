@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-
 from .api import users, auth, categories,expenses, whatsapp
 
 app = FastAPI(
