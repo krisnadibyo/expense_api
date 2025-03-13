@@ -18,7 +18,9 @@ class UserResponse(BaseModel):
   wa_number: str
 
 class UserLogin(BaseModel):
-  username: str
+  username: str | None = None
+  email: str | None = None
+  wa_number: str | None = None
   password: str
 
 class UserTokenResponse(BaseModel):

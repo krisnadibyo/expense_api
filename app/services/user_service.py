@@ -84,9 +84,22 @@ class UserService:
     )
 
   def authenticate_user(self, user_login: UserLogin) -> UserTokenResponse:
-    # find user by username
-    user = self.db.query(User).filter(User.username == user_login.username).first()
-    if not user:
+    if user_login.username:
+      # find user by username
+      user = self.db.query(User).filter(User.username == user_login.username).first()
+      if not user:
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+    elif user_login.email:
+      # find user by email
+      user = self.db.query(User).filter(User.email == user_login.email).first()
+      if not user:
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+    elif user_login.wa_number:
+      # find user by wa_number
+      user = self.db.query(User).filter(User.whatsapp_number == user_login.wa_number).first()
+      if not user:
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+    else:
       raise HTTPException(status_code=401, detail="Invalid username or password")
     
     # Check if password is correct
@@ -97,7 +110,8 @@ class UserService:
     access_token = create_access_token({
       "sub": str(user.id),
       "username": user.username,
-      "email": user.email
+      "email": user.email,
+      "wa_number": user.whatsapp_number
       })
     
     # return user token response
