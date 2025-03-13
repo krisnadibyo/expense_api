@@ -39,6 +39,7 @@ class UserService:
     if user.wa_number and self.db.query(User).filter(User.whatsapp_number == user.wa_number).first():
       raise HTTPException(status_code=400, detail="WhatsApp number already registered")
     
+    print(user)
     # Create user
     db_user = User(
       email=user.email,
