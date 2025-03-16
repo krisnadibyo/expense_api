@@ -1,37 +1,16 @@
 from pydantic import BaseModel, field_validator, validator
 from datetime import date, datetime
 
-class CategoryResponse(BaseModel):
-  names: list[str] = []
-
-class CategoryCreate(BaseModel):
-  name: str
-
-class CategoryEdit(BaseModel):
-  name: str
-  new_name: str
-
-class CategoryDelete(BaseModel):
-  name: str
-
-class CategoryDeleteResponse(BaseModel):
-  status: str = "OK"
-  message: str = "A new category has been deleted"
-
-class CategoryCreateResponse(BaseModel):
-  status: str = "OK"
-  message: str = "A new category has been created"
-
-class CategoryEditResponse(BaseModel):
-  status: str = "OK"
-  message: str = "A new category has been Edited"
-
 class ExpenseResponse(BaseModel):
   id: int
   amount: int
   description: str
   date: str
   category_name: str
+
+class ExpenseDeleteResponse(BaseModel):
+  status: str = "OK"
+  message: str = "Expense deleted successfully"
 
 class ExpenseGet(BaseModel):
   start_date: date
@@ -78,3 +57,10 @@ class ExpenseCreate(BaseModel):
       return datetime.strptime(value, "%Y-%m-%d").date()
     return value
   category_name: str
+
+class ExpenseEdit(BaseModel):
+  id: int
+  amount: int | None = None
+  description: str | None = None
+  date: str | None = None
+  category_name: str | None = None

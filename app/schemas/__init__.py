@@ -1,5 +1,6 @@
 from app.schemas.user import UserResponse, UserCreate, UserLogin, UserTokenResponse
-from app.schemas.expense import ExpenseResponse, ExpenseCreate, ExpensesResponse, CategoryResponse, CategoryCreate, ExpenseGet, CategoryCreateResponse
+from app.schemas.expense import ExpenseResponse, ExpenseCreate, ExpensesResponse, ExpenseGet, ExpenseDeleteResponse, ExpenseEdit
+from app.schemas.category import CategoryResponse, CategoryCreate, CategoryDelete, CategoryEdit, CategoryCreateResponse, CategoryDeleteResponse, CategoryEditResponse
 
 __all__ = [
     "UserResponse",
@@ -12,5 +13,11 @@ __all__ = [
     "UserCreate",
     "UserLogin",
     "UserTokenResponse",
-    "CategoryCreateResponse"
+    "CategoryCreateResponse",
+    "CategoryDeleteResponse",
+    "CategoryEditResponse",
+    "CategoryDelete",
+    "CategoryEdit",
+    "CategoryCreate",
+    "CategoryResponse"
 ]

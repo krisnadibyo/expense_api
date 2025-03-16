@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from app.models import Expense
 from app.schemas import ExpenseCreate, ExpenseGet, ExpenseResponse, ExpensesResponse
-from app.schemas.expense import ExpensePerCategoryResponse, ExpensesPerDayResponse
+from app.schemas.expense import ExpenseEdit, ExpensePerCategoryResponse, ExpensesPerDayResponse
 
 class ExpenseService:
   def __init__(self, db: Session):
@@ -118,3 +118,50 @@ class ExpenseService:
       end_date= end_date
     )
     return self.get_expenses(request, user_id)
+
+  def delete_expense(self, expense_id: int, user_id: int) -> bool:
+    try:
+      expense = self.db.query(Expense).filter(
+        Expense.id == expense_id,
+        Expense.user_id == user_id
+      ).first()
+      if not expense:
+        raise HTTPException(status_code=404, detail="Expense not found")
+      self.db.delete(expense)
+      self.db.commit()
+      return True
+    except SQLAlchemyError as e:
+      self.db.rollback()
+      raise HTTPException(status_code=500, detail=f"Failed to delete expense: {str(e)}")
+      
+  def edit_expense(self, expense_edit: ExpenseEdit, user_id: int) -> ExpenseResponse:
+    try:
+      expense = self.db.query(Expense).filter(
+        Expense.id == expense_edit.id,
+        Expense.user_id == user_id
+      ).first()
+      if not expense:
+        raise HTTPException(status_code=404, detail="Expense not found")
+      if expense_edit.amount is not None:
+        expense.amount = expense_edit.amount
+      if expense_edit.description is not None:
+        expense.description = expense_edit.description
+      if expense_edit.category_name is not None:
+        expense.category_name = expense_edit.category_name
+      if expense_edit.date is not None:
+        expense.date = expense_edit.date
+      self.db.commit()
+      self.db.refresh(expense)
+      return ExpenseResponse(
+        id= expense.id,
+        amount= expense.amount,
+        description= expense.description,
+        date= str(expense.date),
+        category_name= expense.category_name
+      )
+    except SQLAlchemyError as e:
+      raise HTTPException(status_code=500, detail=f"Failed to edit expense: {str(e)}")
+    except HTTPException as e:
+      raise e
+    except Exception as e:
+      raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
