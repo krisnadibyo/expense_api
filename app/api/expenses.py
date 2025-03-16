@@ -28,5 +28,6 @@ async def get_expenses_range(
   current_user: User = Depends(get_current_user), 
   expense_service: ExpenseService = Depends(get_expense_service)
 ):
+  print(f"Getting expenses range for user {current_user.id} with range type {range_type}")
   result = expense_service.get_expenses_range(range_type=range_type, user_id=current_user.id)
   return result

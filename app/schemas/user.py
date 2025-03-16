@@ -15,7 +15,7 @@ class UserUpdate(BaseModel):
 class UserResponse(BaseModel):
   username: str
   email: str
-  wa_number: str
+  wa_number: str | None = None
 
 class UserLogin(BaseModel):
   username: str | None = None

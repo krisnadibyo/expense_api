@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .api import users, auth, categories,expenses, whatsapp
+from .api import users, auth, categories, expenses, whatsapp
 
 app = FastAPI(
   title="Expense API Project",
@@ -10,24 +10,30 @@ app = FastAPI(
     "name": "Krisna D",
     "email": "krisnaatmojo@gmail.com",
   },
+  # Disable automatic redirects for trailing slashes
+  # This prevents FastAPI from redirecting /api/v1/categories to /api/v1/categories/
+  redirect_slashes=False,
 )
 
-# Configure CORS
+# Configure CORS with ngrok domain
 origins = [
     "http://localhost",
-    "http://localhost:3000",    # For React default port
-    "http://localhost:8081",    # For FastAPI default port
+    "http://localhost:3000",
+    "http://localhost:8081",
     "http://127.0.0.1:3000",
     "http://127.0.0.1:8081",
-    # Add any other origins (frontend URLs) you want to allow
+    "https://polite-centrally-goat.ngrok-free.app",  # Your ngrok domain
+    "http://polite-centrally-goat.ngrok-free.app",   # Both http and https versions
+    # Add any other domains you need
 ]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],        # Allows all methods
-    allow_headers=["*"],        # Allows all headers
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
+    expose_headers=["*"]
 )
 
 app.include_router(users.router, prefix="/api/v1")

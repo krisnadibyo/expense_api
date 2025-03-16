@@ -13,6 +13,7 @@ router = APIRouter(
 async def get_users_me(current_user: User = Depends(get_current_user)):
   user_response = UserResponse(
     username=current_user.username,
-    email=current_user.email
+    email=current_user.email,
+    wa_number=current_user.whatsapp_number
   )
   return user_response
