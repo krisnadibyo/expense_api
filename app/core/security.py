@@ -13,14 +13,14 @@ def get_password_hash(password) -> str:
 
 def create_access_token(data: dict) -> str:
   to_encode = data.copy()
-  expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+  expire = datetime.now(timezone.utc) + timedelta(days=settings.ACCESS_TOKEN_EXPIRE_DAYS)
   to_encode.update({"exp": expire})
   encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
   return encoded_jwt
 
 def create_whatsapp_auth_key(wa_number: str) -> str:
     to_encode = {"sub": wa_number}
-    expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.now(timezone.utc) + timedelta(days=settings.ACCESS_TOKEN_EXPIRE_DAYS)
     to_encode.update({"exp": expire, "type": "whatsapp"})
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
