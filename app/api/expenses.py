@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 from fastapi import APIRouter, Depends, Path
 
 from app.dependencies.services import get_expense_service
@@ -18,8 +19,8 @@ async def create_expense(expense_create: ExpenseCreate, current_user: User = Dep
   return result
 
 @router.get("", response_model=ExpensesResponse)
-async def get_expenses(expense_get: ExpenseGet, current_user: User = Depends(get_current_user), expense_service: ExpenseService = Depends(get_expense_service)):
-  result = expense_service.get_expenses(expense_get=expense_get, user_id=current_user.id)
+async def get_expenses(start_date: Optional[str] = None, end_date: Optional[str] = None, current_user: User = Depends(get_current_user), expense_service: ExpenseService = Depends(get_expense_service)):
+  result = expense_service.get_expenses(start_date=start_date, end_date=end_date, user_id=current_user.id)
   return result
 
 @router.put("", response_model=ExpenseResponse)

@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from typing import Optional
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
@@ -39,12 +40,16 @@ class ExpenseService:
         detail=f"failed to create expense: {str(e)}"
       )   
   
-  def get_expenses(self, expense_get: ExpenseGet, user_id: int) -> ExpensesResponse:
+  def get_expenses(self, user_id: int, start_date: Optional[str] = None, end_date: Optional[str] = None) -> ExpensesResponse:
     try:
+      if start_date is None:
+        start_date = datetime.now().date() - timedelta(days=30)
+      if end_date is None:
+        end_date = datetime.now().date()
       expenses = self.db.query(Expense).filter(
         Expense.user_id == user_id,
-        Expense.date >= expense_get.start_date,
-        Expense.date <= expense_get.end_date
+        Expense.date >= start_date,
+        Expense.date <= end_date
       ).order_by(Expense.date.desc()).limit(100).all()
       expenses_data = []
       total_sum = 0
@@ -82,8 +87,8 @@ class ExpenseService:
           amount=amount
         ))
       return ExpensesResponse(
-        start_date= str(expense_get.start_date),
-        end_date= str(expense_get.end_date),
+        start_date= str(start_date),
+        end_date= str(end_date),
         expenses= expenses_data,
         expenses_per_category= expenses_per_category,
         expenses_per_day= expenses_per_day,
