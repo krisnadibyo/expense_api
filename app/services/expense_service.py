@@ -118,11 +118,7 @@ class ExpenseService:
           status_code=400,
           detail=f"Invalid range type: {range_type}. Must be one of: 'today', 'week', 'month', 'quarter'"
         )
-    request = ExpenseGet(
-      start_date= start_date,
-      end_date= end_date
-    )
-    return self.get_expenses(request, user_id)
+    return self.get_expenses(start_date=start_date, end_date=end_date, user_id=user_id)
 
   def delete_expense(self, expense_id: int, user_id: int) -> bool:
     try:
